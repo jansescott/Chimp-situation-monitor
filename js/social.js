@@ -33,6 +33,10 @@ async function fetchBluesky() {
     'kibale chimps',
     'ngogo chimpanzee',
     'primate research uganda',
+    'chimpanzee warfare',
+    'budongo forest',
+    'primate conflict africa',
+    'great ape conservation uganda',
   ];
 
   const fetches = termBatches.map(term => fetchBlueSkyTerm(term));

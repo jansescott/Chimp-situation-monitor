@@ -1073,6 +1073,208 @@ footer {
   .main-grid { padding: 12px; gap: 12px; }
 }
 
+/* ---- SITUATION REPORT ---- */
+.sitrep-section {
+  background: var(--bg-surface);
+  border-bottom: 1px solid var(--border-bright);
+  position: relative;
+  overflow: hidden;
+}
+
+/* Subtle diagonal stripe */
+.sitrep-section::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: repeating-linear-gradient(
+    -45deg,
+    transparent,
+    transparent 40px,
+    rgba(52,211,153,0.015) 40px,
+    rgba(52,211,153,0.015) 41px
+  );
+  pointer-events: none;
+}
+
+.sitrep-inner {
+  max-width: 1600px;
+  margin: 0 auto;
+  padding: 20px 24px;
+  position: relative;
+}
+
+.sitrep-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 20px;
+  margin-bottom: 18px;
+  flex-wrap: wrap;
+}
+
+.sitrep-header-left {}
+
+.sitrep-stamp {
+  font-family: var(--mono);
+  font-size: 9px;
+  letter-spacing: 0.18em;
+  color: var(--accent);
+  background: rgba(52,211,153,0.08);
+  border: 1px solid rgba(52,211,153,0.2);
+  padding: 2px 10px;
+  border-radius: 2px;
+  display: inline-block;
+  margin-bottom: 6px;
+}
+
+.sitrep-title {
+  font-family: var(--display);
+  font-size: 17px;
+  font-weight: 800;
+  color: var(--text-primary);
+  letter-spacing: 0.04em;
+  margin-bottom: 4px;
+}
+
+.sitrep-date {
+  font-family: var(--mono);
+  font-size: 10px;
+  color: var(--text-muted);
+}
+
+/* Threat meter */
+.threat-meter {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  flex-shrink: 0;
+}
+
+.threat-label {
+  font-family: var(--mono);
+  font-size: 9px;
+  letter-spacing: 0.14em;
+  color: var(--text-muted);
+}
+
+.threat-bars {
+  display: flex;
+  gap: 4px;
+  align-items: flex-end;
+}
+
+.threat-bar {
+  width: 14px;
+  border-radius: 2px;
+  background: var(--border-bright);
+  transition: background 0.3s;
+}
+
+.threat-bar:nth-child(1) { height: 14px; }
+.threat-bar:nth-child(2) { height: 20px; }
+.threat-bar:nth-child(3) { height: 26px; }
+.threat-bar:nth-child(4) { height: 32px; }
+.threat-bar:nth-child(5) { height: 38px; }
+
+.threat-bar.active.danger  { background: var(--danger); box-shadow: 0 0 6px rgba(239,68,68,0.4); }
+.threat-bar.active.warning { background: var(--warning); box-shadow: 0 0 6px rgba(245,158,11,0.3); }
+.threat-bar.active.success { background: var(--accent); }
+
+.threat-text {
+  font-family: var(--mono);
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--danger);
+  letter-spacing: 0.1em;
+  text-shadow: 0 0 10px rgba(239,68,68,0.5);
+}
+
+/* Sitrep grid */
+.sitrep-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+@media (max-width: 1200px) {
+  .sitrep-grid { grid-template-columns: repeat(2, 1fr); }
+}
+
+@media (max-width: 600px) {
+  .sitrep-grid { grid-template-columns: 1fr; }
+}
+
+.sitrep-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  overflow: hidden;
+}
+
+.sitrep-card-title {
+  font-family: var(--mono);
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  color: var(--text-secondary);
+  background: var(--bg-card-2);
+  padding: 8px 12px;
+  border-bottom: 1px solid var(--border);
+}
+
+.sitrep-card-body {
+  padding: 12px;
+}
+
+.sitrep-card-body p {
+  font-size: 12px;
+  color: var(--text-secondary);
+  line-height: 1.6;
+  margin-bottom: 10px;
+}
+
+.sitrep-card-body p strong {
+  color: var(--text-primary);
+  font-weight: 600;
+}
+
+.sitrep-tags { display: flex; gap: 6px; flex-wrap: wrap; }
+
+/* Sitrep footer */
+.sitrep-footer {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 12px 16px;
+  display: flex;
+  gap: 24px;
+  flex-wrap: wrap;
+}
+
+.sitrep-footer-item {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  flex: 1;
+  min-width: 200px;
+}
+
+.sitrep-footer-label {
+  font-family: var(--mono);
+  font-size: 9px;
+  letter-spacing: 0.12em;
+  color: var(--text-muted);
+  text-transform: uppercase;
+}
+
+.sitrep-footer-val {
+  font-size: 11px;
+  color: var(--text-secondary);
+  line-height: 1.5;
+}
+
 /* ---- UTILITY ---- */
 .hidden { display: none !important; }
 .text-accent   { color: var(--accent); }

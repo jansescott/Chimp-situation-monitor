@@ -23,11 +23,54 @@ const CONSERVATION_KEYWORDS = [
 
 async function initNews() {
   showNewsLoading();
-  const items = await fetchAllFeeds();
+  // Fetch RSS and Wikipedia summaries in parallel
+  const [items] = await Promise.all([
+    fetchAllFeeds(),
+    injectWikipediaSummaries(),
+  ]);
   allNewsItems = items;
   renderNews(currentNewsTab);
   setupNewsTabs();
   setupNewsRefresh();
+}
+
+// Inject live Wikipedia summary cards into the research tab
+async function injectWikipediaSummaries() {
+  const summaries = await Promise.allSettled(
+    CONFIG.wikipediaTopics.map(topic => fetchWikiSummary(topic))
+  );
+  const valid = summaries
+    .filter(r => r.status === 'fulfilled' && r.value)
+    .map(r => r.value);
+
+  if (valid.length === 0) return;
+
+  // Convert to feed-item-like objects
+  const wikiItems = valid.map(w => ({
+    title: w.title,
+    link: w.content_urls?.desktop?.page || `https://en.wikipedia.org/wiki/${w.title.replace(/ /g, '_')}`,
+    pubDate: new Date(),
+    snippet: w.extract ? w.extract.substring(0, 300) : '',
+    source: 'Wikipedia',
+    category: 'research',
+    isRelevant: true,
+    isResearch: true,
+    isConservation: false,
+    tags: [{ text: 'WIKI', cls: 'tag-blue' }, { text: 'REFERENCE', cls: 'tag-purple' }],
+  }));
+
+  allNewsItems = [...allNewsItems, ...wikiItems];
+}
+
+async function fetchWikiSummary(topic) {
+  try {
+    const url = `https://en.wikipedia.org/api/rest_v1/page/summary/${encodeURIComponent(topic)}`;
+    const res = await fetch(url, { signal: AbortSignal.timeout(5000) });
+    if (!res.ok) return null;
+    return await res.json();
+  } catch {
+    return null;
+  }
 }
 
 function showNewsLoading() {

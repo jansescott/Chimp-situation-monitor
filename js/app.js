@@ -19,16 +19,29 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   // Auto-refresh data every 5 minutes
   setInterval(async () => {
-    const items = await fetchAllFeeds();
-    allNewsItems = items;
-    renderNews(currentNewsTab);
+    nextRefreshAt = Date.now() + CONFIG.refreshInterval;
 
-    await fetchBluesky();
+    const [newsItems] = await Promise.all([
+      fetchAllFeeds(),
+      fetchBluesky(),
+    ]);
+
+    allNewsItems = newsItems;
+    renderNews(currentNewsTab);
     if (currentSocialTab === 'bluesky') renderBluesky();
+
+    // Flash the live badge to signal refresh
+    const badge = document.querySelector('.live-badge');
+    if (badge) {
+      badge.style.background = 'rgba(52,211,153,0.25)';
+      setTimeout(() => { badge.style.background = ''; }, 600);
+    }
   }, CONFIG.refreshInterval);
 });
 
-// ---- Clock ----
+// ---- Clock & Countdown ----
+let nextRefreshAt = Date.now() + CONFIG.refreshInterval;
+
 function updateClock() {
   const now = new Date();
   const timeStr = now.toISOString().replace('T', ' ').substring(0, 19) + ' UTC';
@@ -36,6 +49,13 @@ function updateClock() {
   const footer = document.getElementById('footer-time');
   if (el) el.textContent = timeStr;
   if (footer) footer.textContent = timeStr;
+
+  // Update countdown in footer
+  const secsLeft = Math.max(0, Math.round((nextRefreshAt - Date.now()) / 1000));
+  const mins = String(Math.floor(secsLeft / 60)).padStart(2, '0');
+  const secs = String(secsLeft % 60).padStart(2, '0');
+  const cdEl = document.getElementById('refresh-countdown');
+  if (cdEl) cdEl.textContent = `${mins}:${secs}`;
 }
 
 // ---- Timeline ----
