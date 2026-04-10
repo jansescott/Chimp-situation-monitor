@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Uganda Chimp Conflict Monitor</title>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&family=Syne:wght@700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+  <!-- HEADER -->
+  <header>
+    <div class="header-inner">
+      <div class="logo">
+        <div class="logo-icon-wrap">&#x1F98D;</div>
+        <div>
+          <h1 class="site-title">CHIMP CONFLICT MONITOR</h1>
+          <p class="site-subtitle">Uganda Primate Territorial Intelligence Dashboard</p>
+        </div>
+      </div>
+      <div class="header-right">
+        <div class="live-badge">
+          <span class="pulse-ring"></span>
+          <span class="pulse-dot"></span>
+          LIVE
+        </div>
+        <div class="header-meta">
+          <div class="meta-item">
+            <span class="meta-label">LAST UPDATED</span>
+            <span class="meta-value" id="last-updated-time">--:--:--</span>
+          </div>
+          <div class="meta-item">
+            <span class="meta-label">STATUS</span>
+            <span class="meta-value status-elevated" id="conflict-status">ELEVATED TENSION</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- STATS BAR -->
+  <section class="stats-bar">
+    <div class="stat-card">
+      <div class="stat-icon">&#x1F9EC;</div>
+      <div class="stat-body">
+        <div class="stat-value">~1,500</div>
+        <div class="stat-label">Monitored Chimps</div>
+      </div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon">&#x1F465;</div>
+      <div class="stat-body">
+        <div class="stat-value">12</div>
+        <div class="stat-label">Active Communities</div>
+      </div>
+    </div>
+    <div class="stat-card danger">
+      <div class="stat-icon">&#x26A0;&#xFE0F;</div>
+      <div class="stat-body">
+        <div class="stat-value" id="stat-zones">7</div>
+        <div class="stat-label">Active Conflict Zones</div>
+      </div>
+    </div>
+    <div class="stat-card warning">
+      <div class="stat-icon">&#x1F6E1;&#xFE0F;</div>
+      <div class="stat-body">
+        <div class="stat-value">3</div>
+        <div class="stat-label">Border Patrols / Week</div>
+      </div>
+    </div>
+    <div class="stat-card success">
+      <div class="stat-icon">&#x1F4CD;</div>
+      <div class="stat-body">
+        <div class="stat-value">+22%</div>
+        <div class="stat-label">Ngogo Territory Gain</div>
+      </div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon">&#x1F52D;</div>
+      <div class="stat-body">
+        <div class="stat-value">47</div>
+        <div class="stat-label">Active Researchers</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- MAP SECTION -->
+  <section class="map-section">
+    <div class="section-header">
+      <h2 class="section-title">TERRITORIAL MAP</h2>
+      <div class="map-layer-controls">
+        <button class="layer-btn active" data-layer="territories">&#x1F5FA; Territories</button>
+        <button class="layer-btn active" data-layer="stations">&#x1F3D5; Research Stations</button>
+        <button class="layer-btn active" data-layer="conflicts">&#x1F525; Conflict Zones</button>
+        <button class="layer-btn" data-layer="patrols">&#x1F9ED; Patrol Routes</button>
+      </div>
+    </div>
+    <div id="map"></div>
+    <div class="map-legend">
+      <div class="legend-title">LEGEND</div>
+      <div class="legend-items">
+        <div class="legend-item"><span class="legend-swatch" style="background:#f97316;opacity:0.7"></span>Ngogo Territory</div>
+        <div class="legend-item"><span class="legend-swatch" style="background:#3b82f6;opacity:0.7"></span>Kanyawara Territory</div>
+        <div class="legend-item"><span class="legend-swatch" style="background:#22c55e;opacity:0.7"></span>Budongo Forest</div>
+        <div class="legend-item"><span class="legend-swatch" style="background:#a78bfa;opacity:0.7"></span>Other Communities</div>
+        <div class="legend-item"><span class="legend-swatch conflict-swatch"></span>Active Conflict</div>
+        <div class="legend-item"><span class="legend-icon-swatch">&#x1F3D5;</span>Research Station</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- MAIN CONTENT GRID -->
+  <div class="main-grid">
+
+    <!-- LEFT: INTEL FEEDS -->
+    <div class="grid-col">
+
+      <!-- NEWS PANEL -->
+      <section class="panel">
+        <div class="panel-header">
+          <h2 class="panel-title">INTEL FEED</h2>
+          <div class="panel-badges">
+            <span class="badge">NEWS &amp; RESEARCH</span>
+            <button class="refresh-btn" id="refresh-news" title="Refresh news">&#x21BB;</button>
+          </div>
+        </div>
+        <div class="tab-bar" id="news-tabs">
+          <button class="tab active" data-tab="news-latest">Latest</button>
+          <button class="tab" data-tab="news-research">Research</button>
+          <button class="tab" data-tab="news-conservation">Conservation</button>
+        </div>
+        <div class="feed-container" id="news-feed">
+          <div class="feed-loading">
+            <div class="loading-bar"></div>
+            <span>Scanning intelligence sources&hellip;</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- SOCIAL PANEL -->
+      <section class="panel">
+        <div class="panel-header">
+          <h2 class="panel-title">SOCIAL SIGNALS</h2>
+          <div class="panel-badges">
+            <span class="badge live-badge-sm">LIVE</span>
+            <button class="refresh-btn" id="refresh-social" title="Refresh social">&#x21BB;</button>
+          </div>
+        </div>
+        <div class="tab-bar" id="social-tabs">
+          <button class="tab active" data-tab="bluesky">Bluesky</button>
+          <button class="tab" data-tab="x-twitter">X / Twitter</button>
+        </div>
+        <div class="feed-container" id="social-feed">
+          <div class="feed-loading">
+            <div class="loading-bar"></div>
+            <span>Scanning social signals&hellip;</span>
+          </div>
+        </div>
+      </section>
+
+    </div>
+
+    <!-- RIGHT: CHARTS + TIMELINE -->
+    <div class="grid-col">
+
+      <!-- CHARTS PANEL -->
+      <section class="panel">
+        <div class="panel-header">
+          <h2 class="panel-title">DATA INTELLIGENCE</h2>
+        </div>
+        <div class="tab-bar" id="chart-tabs">
+          <button class="tab active" data-chart="population">Population</button>
+          <button class="tab" data-chart="conflicts">Conflicts</button>
+          <button class="tab" data-chart="territory">Territory</button>
+        </div>
+        <div class="chart-wrap">
+          <canvas id="main-chart"></canvas>
+        </div>
+        <p class="chart-caption" id="chart-caption">Population distribution across monitored communities in Uganda (estimated individuals)</p>
+      </section>
+
+      <!-- CONFLICT TIMELINE PANEL -->
+      <section class="panel timeline-panel">
+        <div class="panel-header">
+          <h2 class="panel-title">CONFLICT TIMELINE</h2>
+          <span class="badge">HISTORICAL RECORD</span>
+        </div>
+        <div class="timeline-container" id="timeline">
+          <!-- populated by JS -->
+        </div>
+      </section>
+
+    </div>
+  </div>
+
+  <!-- RESEARCH RESOURCES -->
+  <section class="resources-section">
+    <div class="section-header">
+      <h2 class="section-title">RESEARCH RESOURCES &amp; KEY STUDIES</h2>
+    </div>
+    <div class="resources-grid" id="resources-grid">
+      <!-- populated by JS -->
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer>
+    <div class="footer-inner">
+      <div class="footer-col">
+        <div class="footer-title">DATA SOURCES</div>
+        <p>Ngogo Chimpanzee Project (Mitani &amp; Watts, University of Michigan / Yale)</p>
+        <p>Kibale Chimpanzee Project (Makerere University / University of Minnesota)</p>
+        <p>Budongo Conservation Field Station (University of St Andrews)</p>
+        <p>IUCN Red List &bull; Uganda Wildlife Authority</p>
+      </div>
+      <div class="footer-col">
+        <div class="footer-title">ABOUT</div>
+        <p>This dashboard aggregates public research data, news, and social media to monitor ongoing territorial conflicts among chimpanzee communities in Uganda's forest reserves.</p>
+        <p class="footer-note">Not affiliated with any research institution. For educational purposes.</p>
+      </div>
+      <div class="footer-col">
+        <div class="footer-title">KEY STUDY SITES</div>
+        <p>&#x1F4CD; Kibale National Park (Ngogo + Kanyawara)</p>
+        <p>&#x1F4CD; Budongo Forest Reserve (Sonso + Waibira)</p>
+        <p>&#x1F4CD; Bwindi Impenetrable Forest</p>
+        <p>&#x1F4CD; Queen Elizabeth NP (Kalinzu + Maramagambo)</p>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span>Uganda Chimp Conflict Monitor &bull; Data refreshes every 5 minutes &bull; <span id="footer-time"></span></span>
+    </div>
+  </footer>
+
+  <!-- SCRIPTS -->
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  <script src="js/config.js"></script>
+  <script src="js/map.js"></script>
+  <script src="js/news.js"></script>
+  <script src="js/social.js"></script>
+  <script src="js/charts.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
